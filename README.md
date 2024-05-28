@@ -17,7 +17,7 @@ Like original PhaseFinder, PhaseFinderDC works by identifying regions flanked by
 
 To install PhaseFinderDC
 ```
-git clone git@github.com:nlm-irp-jianglab/PhaseFinderDC.git
+git clone git@github.com:xiaofanjin/PhaseFinderDC.git
 cd PhaseFinderDC
 conda env create --file environment.yml
 conda activate PhaseFinderDC
