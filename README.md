@@ -1,40 +1,43 @@
-# PhaseFinder
+# PhaseFinderDC
 
 ## Overview
-The PhaseFinder algorithm is designed to detect DNA inversion mediated phase variation in bacterial genomes using genomic or metagenomic sequencing data. It works by identifying regions flanked by inverted repeats, mimicking their inversion in silico, and identifying regions where sequencing reads support both orientations. Here, we define phase variation as "a process employed by bacteria to generate frequent and reversible changes within specific hypermutable loci, introducing phenotypic diversity into clonal populations”. Not every region detected by PhaseFinder will directly result in phase variation, but the results should be highly enriched for regions that do. 
+PhaseFinderDC is a workflow adapted from the original [PhaseFinder](https://github.com/XiaofangJ/PhaseFinder) algorithm. Like PhaseFinder, it is designed to detect DNA inversion mediated phase variation in bacterial genomes using metagenomic sequencing data. PhaseFinderDC includes several modifications that optimize its performance for metagenomic sequencing data from mixtures of defined communities (DC). A defined community is one in which all bacterial strains present are known, and (ideally) have a high quality genome sequence. 
+
+Like original PhaseFinder, PhaseFinderDC works by identifying regions flanked by inverted repeats, mimicking their inversion in silico, and identifying regions where sequencing reads support both orientations. New modifications in PhaseFinderDC include: (1) use of bowtie2 instead of bowtie for read alignment, (2) inclusion of full genome sequence in bowtie2 index instead of only sequences of inverted repeat regions, and (3) MAPQ filtering of bowtie2 read alignments to ignore cases of potential cross-mapping. These modifications allow PhaseFinderDC to identify invertons with high sensitivity and specificity in defined communities, even when closely related strains are present.
 
 ## Prerequisites
 + [Biopython](https://biopython.org/)
 + [pandas](https://pandas.pydata.org)
 + [samtools](http://samtools.sourceforge.net/) (>=1.4)
-+ [bowtie](https://github.com/BenLangmead/bowtie)(>=version 1.2.0)
++ [bowtie2](https://github.com/BenLangmead/bowtie2)
 + [einverted](http://emboss.sourceforge.net/apps/release/6.6/emboss/apps/einverted.html)
 + [bedops](https://bedops.readthedocs.io/en/latest/)
 + [bedtools](https://bedtools.readthedocs.io/en/latest/)
++ [click](https://click.palletsprojects.com/en/8.1.x/)
 
-To install PhaseFinder
+To install PhaseFinderDC
 ```
-git clone git@github.com:nlm-irp-jianglab/PhaseFinder.git
-cd PhaseFinder
+git clone git@github.com:nlm-irp-jianglab/PhaseFinderDC.git
+cd PhaseFinderDC
 conda env create --file environment.yml
-conda activate PhaseFinder
+conda activate PhaseFinderDC
 ```
 
 ## Quick Start
-All you need to get started is a genome (in fasta format) you would like to search for invertible DNA regions and genomic sequencing data (preferrably Illumina in fastq format) from the same organism, or metagenomic sequencing data from a sample containing the organism (preferrably Illumina in fastq format). 
+As with the original PhaseFinder, all you need to get started with PhaseFinderDC is a genome (in fasta format) you would like to search for invertible DNA regions and genomic sequencing data (preferrably Illumina in fastq format) from the same organism, or metagenomic sequencing data from a sample containing the organism (preferrably Illumina in fastq format). For communities with multiple strains, concatenate the fasta files for each strain's genome into a single input genome fasta file.
 
-To test PhaseFinder, you can use the example files (genome: test.fa, genomic data: p1.fq, p2.fq) 
+To test PhaseFinderDC, you can use the example files supplied with the original PhaseFinder (genome: test.fa, genomic data: p1.fq, p2.fq) 
 
 Example:
 ```
 # Identify regions flanked by inverted repeats 
-python PhaseFinder.py locate -f ./data/test.fa -t ./data/test.einverted.tab -g 15 85 -p 
+python PhaseFinderDC.py locate -f ./data/test.fa -t ./data/test.einverted.tab -g 15 85 -p 
 
 # Mimic inversion
-python PhaseFinder.py create -f ./data/test.fa -t ./data/test.einverted.tab -s 1000 -i ./data/test.ID.fasta
+python PhaseFinderDC.py create -f ./data/test.fa -t ./data/test.einverted.tab -s 1000 -i ./data/test.ID.fasta
 
 # Identify regions where sequencing reads support both orientations 
-python PhaseFinder.py ratio -i ./data/test.ID.fasta -1 ./data/p1.fq -2 ./data/p2.fq -p 16 -o ./data/out
+python PhaseFinderDC.py ratio -i ./data/test.ID.fasta -1 ./data/p1.fq -2 ./data/p2.fq -p 16 -o ./data/out
 ```
 
 If successful, the output will be in data/out.ratio.txt
@@ -45,11 +48,11 @@ In this example, there is one real example of an invertible DNA region "am_0171_
 
 ## Tutorial
 ### 1. Generate a position table of regions flanked by inverted repeats 
-Users can identify inverted repeats using the "PhaseFinder.py locate" command, or generate their own table.
+Users can identify inverted repeats using the "PhaseFinderDC.py locate" command, or generate their own table. Note "PhaseFinderDC.py locate" is identical to the original "PhaseFinder.py locate"
 
 #### 1.1. Generate the position table with the PhaseFinder script
 ```
-Usage: PhaseFinder.py locate [OPTIONS]
+Usage: PhaseFinderDC.py locate [OPTIONS]
 
   Locate putative inverted regions
 
@@ -73,17 +76,17 @@ Options:
 ##### Output: A table file containing the postion information of invereted repeats in the genome
 
 ##### Examples:
-* Run the default PhaseFinder locate parameters
+* Run the default PhaseFinderDC locate parameters
 ```
-python PhaseFinder.py locate -f ./data/test.fa -t ./data/test.einverted.tab 
+python PhaseFinderDC.py locate -f ./data/test.fa -t ./data/test.einverted.tab 
 ```
 * Run the default PhaseFinder locate parameters and remove inverted repeats with GC content lower than 15% and higher than 85% or with homopolymers
 ```
-python PhaseFinder.py locate -f ./data/test.fa -t ./data/test.einverted.tab -g 15 85 -p 
+python PhaseFinderDC.py locate -f ./data/test.fa -t ./data/test.einverted.tab -g 15 85 -p 
 ```
 * Run with the specified einverted parameters "-maxrepeat 750 -gap 100 -threshold 51 -match 5 -mismatch -9" 
 ```
-python PhaseFinder.py locate -f ./data/test.fa -t ./data/test.einverted.tab -e "-maxrepeat 750 -gap 100 -threshold 51 -match 5 -mismatch -9" 
+python PhaseFinderDC.py locate -f ./data/test.fa -t ./data/test.einverted.tab -e "-maxrepeat 750 -gap 100 -threshold 51 -match 5 -mismatch -9" 
 ```
 
 
@@ -107,7 +110,7 @@ A table file with five columns (tab delimited):
 ---
 ### 2. Mimic inversion in silico to create a database of inverted sequences
 ```
-Usage: PhaseFinder.py create [OPTIONS]
+Usage: PhaseFinderDC.py create [OPTIONS]
 
   Create inverted fasta file
 
@@ -118,6 +121,7 @@ Options:
   -s, --flanksize INTEGER  Base pairs of flanking DNA on both sides of the
                            identified inverted repeats  [required]
   -i, --inv PATH           Output path of the inverted fasta file  [required]
+  -p, --threads INTEGER    Number of threads to use for building bowtie2 index [default 1]
   --help                   Show this message and exit.
 ```
 
@@ -125,13 +129,13 @@ Options:
 * The position table from step 1
 
 #### Output
-* A fasta file containing inverted (R) and non-inverted (F) putative invertible DNA regions flanked by sequences of specified length (bowtie indexed)
+* A fasta file containing inverted (R) and non-inverted (F) putative invertible DNA regions flanked by sequences of specified length (bowtie2 indexed). Note that unlike the original PhaseFinder, PhaseFinderDC also includes in this fasta file sequences of intervening regions between putative invertible DNA regions, thus the final bowtie2 index covers the full sequence of original input genomes.
 * A table file (with suffix ".info.tab") describing the location of inverted repeats in the above fasta file
 
 ---
 ### 3. Align sequence reads to inverted sequence database and calculate the ratio of reads aligning to the F or R orienation. 
 ```
-Usage: PhaseFinder.py ratio [OPTIONS]
+Usage: PhaseFinderDC.py ratio [OPTIONS]
 
   Align reads to inverted fasta file
 
@@ -140,6 +144,7 @@ Options:
   -1, --fastq1 PATH      First pair in fastq  [required]
   -2, --fastq2 PATH      Second pair in fastq  [required]
   -p, --threads INTEGER  Number of threads
+  -q, --minmapq INTEGER  bowtie2 MAPQ threshold to filter read alignments [default 30]
   -o, --output TEXT      Output prefix  [required]
   --help                 Show this message and exit.
 ```
@@ -147,9 +152,10 @@ Options:
 #### Input
 * Output from step 2
 * fastq file of genomic or metagenomic sequence used to verify DNA inversion
-* Number of threads used for bowtie alignment and samtools process
+* Number of threads used for bowtie2 alignment and samtools process. PhaseFinderDC uses bowtie2 instead of bowtie
+* MAPQ filter threshold (new feature in PhaseFinderDC): bowtie2 alignments with MAPQ score less than this threshold are ignored when counting reads
 #### Output
-* A table file (with suffix ".ratio.txt") containing the reads that supporting either R or F orientation of invertible DNA
+* A table file (with suffix ".ratio.txt") containing the reads that supporting either R or F orientation of invertible DNA - formatting follows that of the original PhaseFinder algorithm
 
  Column name | Explanation                                                                 |
 -------------|-----------------------------------------------------------------------------|
@@ -161,15 +167,10 @@ Span_F       | The number of reads supporting the F orientation spanning the inv
 Span_R       | The number of reads supporting the R orientation spanning the inverted repeat by at least 10 bp on either side
 Span_ratio   | Span_R/(Span_F + Span_R). The percent of reads supporting the R orientation with the spanning method. 
 
-True invertible regions have reads supporting both the F and R orientation. We recommend combining the information from both the paired-end (Pe) and spanning (Span) methods to find valid invertible DNA regions. Our default is to classify a region as invertible if at least 1% of reads support the R orientation with a minimum Pe_R > 5 and Span_R > 3. 
-
-### 4. (Optional) Subset for intergenic invertible DNA regions 
-
-If you are especially interested in intergenic regulatory regions, such as promoters, you can remove predicted invertible regions overlapping with coding sequences (CDS). First, obtain an annotation for the genome of interest from the NCBI or that you genereate yourself in GFF3 format. Second, subsubset the annotation for CDS regions only. Third, use the following command to process the output of PhaseFinder step 3 to obtain a list of intergenic putative invertible DNA regions.
-
-```
-sed '1d' output_from_phasefinder.ratio.txt| awk '{print $1"\t"$0}'|sed 's/:/\t/;s/-[^\t]*-/\t/'|sortBed |closestBed  -a - -b annotation.gff  -d |awk '$20!=0{print $3}' > intergenic_IDR.txt
-```
+As with the original PhaseFinder algorithm, true invertible regions have reads supporting both the F and R orientation. We recommend combining the information from both the paired-end (Pe) and spanning (Span) methods to find valid invertible DNA regions. Our default is similar to that recommended by the original PhaseFinder, to classify a region as invertible if Pe_R >= 5 and Span_R >= 5 and Pe_F >= 5 and Span_F >= 5. 
 
 ## Citation
+Jin X, et al. Comprehensive profiling of genomic invertons in defined gut microbial community reveals associations with intestinal colonization and surface adhesion, *bioRxiv* (2024) 
+
+## Citation for original PhaseFinder
 Jiang X, Hall AB, et al. Invertible promoters mediate bacterial phase variation, antibiotic resistance, and host adaptation in the gut, *Science* (2019) [DOI: 10.1126/science.aau5238](http://science.sciencemag.org/content/363/6423/181)
