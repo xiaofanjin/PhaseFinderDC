@@ -240,52 +240,74 @@ def locate(fasta, tab, einv, mismatch, irsize, gcratio, polymer):
     default=500,
 )
 @click.option(
+    "-p", "--threads", help="Number of threads", type=int, default=1, required=False
+)
+@click.option(
     "-i",
     "--inv",
     help="Output path of the inverted fasta file",
     required=True,
     type=click.Path(),
 )
-def create(fasta, tab, flanksize, inv):
+
+def create(fasta, tab, flanksize, threads, inv):
     # step 2: read the genome with IR and the IR position info to create sequences with putative invertible region inverted
 
     outseq = list()
     seq_dict = SeqIO.to_dict(SeqIO.parse(fasta, "fasta"))
     lines = [x.rstrip().split("\t") for x in open(tab)]
     with open(inv + ".info.tab", "w") as f:
-        for each_line in lines:
-            each_seq = seq_dict[each_line[0]]
-            left_pos2 = int(each_line[2])
-            right_pos1 = int(each_line[3])
-            left_pos1 = max(int(each_line[1]) - flanksize, 0)
-            right_pos2 = min(int(each_line[4]) + flanksize, len(each_seq.seq))
+        for contigName in seq_dict.keys():
+            each_seq = seq_dict[contigName]
+            seqLen=len(each_seq.seq)
+            pos=0
+            subsetLines=[line for line in lines if line[0]==contigName]
+            subsetLines.sort(key=lambda x: int(x[1]))
+            for each_line in subsetLines:
 
-            left_seq = each_seq[left_pos1:left_pos2]
-            right_seq = each_seq[right_pos1:right_pos2]
-            midfwd_seq = each_seq[left_pos2:right_pos1]
-            # inverted the sequence between pos2 and pos3
-            midrev_seq = midfwd_seq.reverse_complement()
-            Fversion = left_seq + midfwd_seq + right_seq
-            Rversion = left_seq + midrev_seq + right_seq
-            name = each_line[0] + ":" + "-".join(each_line[1:5])
+                if pos<int(each_line[1]):
+                    inter_seq=each_seq[pos:int(each_line[1])]
+                    inter_seq.id=each_line[0] + ":" + f"{pos}-{each_line[1]}"
+                    inter_seq.description = ""
+                    outseq.append(inter_seq)
+                if pos < int(each_line[4]):
+                    pos=int(each_line[4])
 
-            outputpos = list(map(int, each_line[1:5]))
-            outputpos.append(right_pos2)
-            outputpos = list(map(lambda x: x - left_pos1, outputpos))
+                left_pos2 = int(each_line[2])
+                right_pos1 = int(each_line[3])
+                left_pos1 = max(int(each_line[1]) - flanksize, 0)
+                right_pos2 = min(int(each_line[4]) + flanksize, len(each_seq.seq))
 
-            f.write(name + "\t" + "\t".join(map(str, outputpos)) + "\n")
+                left_seq = each_seq[left_pos1:left_pos2]
+                right_seq = each_seq[right_pos1:right_pos2]
+                midfwd_seq = each_seq[left_pos2:right_pos1]
+                # inverted the sequence between pos2 and pos3
+                midrev_seq = midfwd_seq.reverse_complement()
+                Fversion = left_seq + midfwd_seq + right_seq
+                Rversion = left_seq + midrev_seq + right_seq
+                name = each_line[0] + ":" + "-".join(each_line[1:5])
 
-            Fversion.id = name + "_F"
-            Rversion.id = name + "_R"
-            Fversion.description = ""
-            Rversion.description = ""
-            outseq.append(Fversion)
-            outseq.append(Rversion)
+                outputpos = list(map(int, each_line[1:5]))
+                outputpos.append(right_pos2)
+                outputpos = list(map(lambda x: x - left_pos1, outputpos))
 
-    # write the inverted sequence and index with bowtie-build
+                f.write(name + "\t" + "\t".join(map(str, outputpos)) + "\n")
+
+                Fversion.id = name + "_F"
+                Rversion.id = name + "_R"
+                Fversion.description = ""
+                Rversion.description = ""
+                outseq.append(Fversion)
+                outseq.append(Rversion)
+            final_seq=each_seq[pos:seqLen]
+            final_seq.id=contigName + ":" + f"{pos}-{seqLen}"
+            final_seq.description = ""
+            outseq.append(final_seq)
+                
+    # write the inverted sequence and index with bowtie2-build
     with open(inv, "w") as fasta_out:
         SeqIO.write(outseq, fasta_out, "fasta")
-    cmd = """ bowtie-build {genome} {genome} """.format(genome=inv)
+    cmd = """ bowtie2-build --threads {core} {genome} {genome} """.format(genome=inv, core=threads)
     print("****** NOW RUNNING COMMAND ******: " + cmd)
     run_cmd(cmd)
 
@@ -315,15 +337,19 @@ def create(fasta, tab, flanksize, inv):
 @click.option(
     "-p", "--threads", help="Number of threads", type=int, default=1, required=False
 )
+@click.option(
+    "-q", "--minmapq", help="bowtie2 mapQ threshold to filter read alignments", type=int, default=30, required=False
+)
 @click.option("-o", "--output", help="Output prefix", required=True, type=str)
-def ratio(inv, fastq1, fastq2, threads, output):
+def ratio(inv, fastq1, fastq2, threads, minmapq, output):
     # step 3: align reads to the inverted sequence and identify reads supporting either R or F orientations
 
     oversize = 10  # require 10 base pairs spanning the invertible region and surrounding genome
 
-    cmd = """ bowtie -p {core}  -a --best --strata {genome} -1 {fq1} -2 {fq2} -S|\
-    samtools view -@ {core} -F 4 -h  |sam2bed -d|sortBed |cut -f 1-4,7 > {output}.bed """.format(
-        genome=inv, fq1=fastq1, fq2=fastq2, output=output, core=threads
+    cmd = """ 
+    bowtie2 --threads {core}  -X 2000 --very-sensitive -x {genome} -1 {fq1} -2 {fq2} | samtools view -bS > {output}.bam
+    samtools view -@ {core} -F 4 -q {minmapq} {output}.bam |sam2bed -d| awk 'BEGIN{{OFS="\\t"}}$1~/(_R|_F)$/{{print $1,$2,$3,$4,$7}}' |sortBed > {output}.bed """.format(
+        genome=inv, fq1=fastq1, fq2=fastq2, output=output, core=threads, minmapq=minmapq
     )
     print("****** NOW RUNNING COMMAND ******: " + cmd)
     run_cmd(cmd)
@@ -377,7 +403,7 @@ def ratio(inv, fastq1, fastq2, threads, output):
 
 
 if __name__ == "__main__":
-    for i in ["bowtie", "samtools", "sam2bed", "einverted"]:
+    for i in ["bowtie2", "samtools", "sam2bed", "einverted"]:
         if not is_tool(i):
             print("Tool {i} is not installed".format(i=i))
             sys.exit(0)
