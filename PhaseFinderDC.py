@@ -341,6 +341,7 @@ def create(fasta, tab, flanksize, threads, inv):
     "-q", "--minmapq", help="bowtie2 mapQ threshold to filter read alignments", type=int, default=30, required=False
 )
 @click.option("-o", "--output", help="Output prefix", required=True, type=str)
+@click.option('--keepbam', '-kb', is_flag=True, help="Keep bam file output")
 def ratio(inv, fastq1, fastq2, threads, minmapq, output):
     # step 3: align reads to the inverted sequence and identify reads supporting either R or F orientations
 
@@ -394,10 +395,14 @@ def ratio(inv, fastq1, fastq2, threads, minmapq, output):
         }
     ).fillna("NA")
     df.to_csv(output + ".ratio.txt", sep="\t", index=False)
-
-    cmd = """rm {output}.bed {output}.tab {output}.span.count {output}.pe.count {out}.bed {out}.info""".format(
-        output=output, out=inv + ".info.tab"
-    )
+    if keepbam:
+        cmd = """rm {output}.bed {output}.tab {output}.span.count {output}.pe.count {out}.bed {out}.info""".format(
+            output=output, out=inv + ".info.tab"
+        )
+    else:
+        cmd = """rm {output}.bam {output}.bed {output}.tab {output}.span.count {output}.pe.count {out}.bed {out}.info""".format(
+            output=output, out=inv + ".info.tab"
+        )        
     print("****** NOW RUNNING COMMAND ******: " + cmd)
     run_cmd(cmd)
 
