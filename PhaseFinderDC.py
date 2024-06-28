@@ -342,7 +342,7 @@ def create(fasta, tab, flanksize, threads, inv):
 )
 @click.option("-o", "--output", help="Output prefix", required=True, type=str)
 @click.option('--keepbam', '-kb', is_flag=True, help="Keep bam file output")
-def ratio(inv, fastq1, fastq2, threads, minmapq, output):
+def ratio(inv, fastq1, fastq2, threads, minmapq, output,keepbam):
     # step 3: align reads to the inverted sequence and identify reads supporting either R or F orientations
 
     oversize = 10  # require 10 base pairs spanning the invertible region and surrounding genome
