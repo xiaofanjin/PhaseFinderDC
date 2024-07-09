@@ -37,7 +37,7 @@ python PhaseFinderDC.py locate -f ./data/test.fa -t ./data/test.einverted.tab -g
 python PhaseFinderDC.py create -f ./data/test.fa -t ./data/test.einverted.tab -s 1000 -i ./data/test.ID.fasta
 
 # Identify regions where sequencing reads support both orientations 
-python PhaseFinderDC.py ratio -i ./data/test.ID.fasta -1 ./data/p1.fq -2 ./data/p2.fq -p 16 -o ./data/out
+python PhaseFinderDC.py ratio -i ./data/test.ID.fasta -1 ./data/p1.fq -2 ./data/p2.fq -o ./data/out
 ```
 
 If successful, the output will be in data/out.ratio.txt
