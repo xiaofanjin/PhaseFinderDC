@@ -2,6 +2,7 @@
 import click
 import os
 import sys
+import warnings
 import subprocess
 import re
 import tempfile
@@ -9,7 +10,7 @@ from collections import defaultdict
 import pandas as pd
 from Bio import SeqIO
 from Bio.SeqUtils import gc_fraction
-
+warnings.filterwarnings('ignore')
 
 def run_cmd(cmd):
     p = subprocess.Popen(
