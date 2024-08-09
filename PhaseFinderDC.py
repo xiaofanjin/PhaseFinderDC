@@ -2,7 +2,6 @@
 import click
 import os
 import sys
-import warnings
 import subprocess
 import re
 import tempfile
@@ -10,7 +9,6 @@ from collections import defaultdict
 import pandas as pd
 from Bio import SeqIO
 from Bio.SeqUtils import gc_fraction
-warnings.filterwarnings('ignore')
 
 def run_cmd(cmd):
     p = subprocess.Popen(
@@ -366,7 +364,7 @@ def ratio(inv, fastq1, fastq2, threads, minmapq, output,keepbam):
     run_cmd(cmd)
 
     cmd = """
-    cat {output}.bed|awk 'BEGIN{{OFS="\\t"}}{{print $4,$5,$1}}'|sed 's/_\(.\)$/\\t\\1/g'|awk '{{if(and(64,$2)){{P=1}}else{{P=2}};print $1"\\t"P"\\t"$3"\\t"$4}}' > {output}.tab
+    cat {output}.bed|awk 'BEGIN{{OFS="\\t"}}{{print $4,$5,$1}}'|sed 's/_\\(.\\)$/\\t\\1/g'|awk '{{if(and(64,$2)){{P=1}}else{{P=2}};print $1"\\t"P"\\t"$3"\\t"$4}}' > {output}.tab
     cut -f 1-3 {output}.tab|sort|uniq -u|fgrep -f - {output}.tab|cut -f 3-4|sort|uniq -c|awk '{{print $2"\\t"$3"\\t"$1}}' >{output}.pe.count """.format(
         output=output
     )
