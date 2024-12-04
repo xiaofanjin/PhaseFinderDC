@@ -144,8 +144,10 @@ Options:
   -1, --fastq1 PATH      First pair in fastq  [required]
   -2, --fastq2 PATH      Second pair in fastq  [required]
   -p, --threads INTEGER  Number of threads
-  -q, --minmapq INTEGER  bowtie2 MAPQ threshold to filter read alignments [default 30]
+  -q, --minmapq INTEGER  bowtie2 mapQ threshold to filter read alignments
+  -a, --bt2args TEXT     bowtie2 arguments
   -o, --output TEXT      Output prefix  [required]
+  -kb, --keepbam         Keep bam file output
   --help                 Show this message and exit.
 ```
 
@@ -153,7 +155,8 @@ Options:
 * Output from step 2
 * fastq file of genomic or metagenomic sequence used to verify DNA inversion
 * Number of threads used for bowtie2 alignment and samtools process. PhaseFinderDC uses bowtie2 instead of bowtie
-* MAPQ filter threshold (new feature in PhaseFinderDC): bowtie2 alignments with MAPQ score less than this threshold are ignored when counting reads
+* MAPQ filter threshold (new feature in PhaseFinderDC): bowtie2 alignments with MAPQ score less than this threshold are ignored when counting reads (default = 30)
+* flexible bowtie2 align arguments: string specifying flags to pass on to bowtie2 aligner, use double quotes (default = "--very-sensitive")
 #### Output
 * A table file (with suffix ".ratio.txt") containing the reads that supporting either R or F orientation of invertible DNA - formatting follows that of the original PhaseFinder algorithm
 
