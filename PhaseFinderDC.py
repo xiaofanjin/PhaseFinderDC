@@ -339,17 +339,20 @@ def create(fasta, tab, flanksize, threads, inv):
 @click.option(
     "-q", "--minmapq", help="bowtie2 mapQ threshold to filter read alignments", type=int, default=30, required=False
 )
+@click.option(
+    "-a", "--bt2args", help="bowtie2 arguments", type=str, default="--very-sensitive", required=False
+)
 @click.option("-o", "--output", help="Output prefix", required=True, type=str)
-@click.option('--keepbam', '-kb', is_flag=True, help="Keep bam file output")
-def ratio(inv, fastq1, fastq2, threads, minmapq, output,keepbam):
+@click.option('--keepbam', '-kb', is_flag=True, help="Keep bam file output", default=False, required=False)
+def ratio(inv, fastq1, fastq2, threads, minmapq, bt2args, output, keepbam):
     # step 3: align reads to the inverted sequence and identify reads supporting either R or F orientations
 
     oversize = 10  # require 10 base pairs spanning the invertible region and surrounding genome
 
     cmd = """ 
-    bowtie2 --threads {core}  -X 2000 --very-sensitive -x {genome} -1 {fq1} -2 {fq2} | samtools view -bS > {output}.bam
+    bowtie2 --threads {core}  -X 2000 {bt2args} -x {genome} -1 {fq1} -2 {fq2} | samtools view -bS > {output}.bam
     samtools view -@ {core} -F 4 -q {minmapq} {output}.bam |sam2bed -d| awk 'BEGIN{{OFS="\\t"}}$1~/(_R|_F)$/{{print $1,$2,$3,$4,$7}}' |sortBed > {output}.bed """.format(
-        genome=inv, fq1=fastq1, fq2=fastq2, output=output, core=threads, minmapq=minmapq
+        genome=inv, fq1=fastq1, fq2=fastq2, output=output, core=threads, minmapq=minmapq, bt2args=bt2args
     )
     print("****** NOW RUNNING COMMAND ******: " + cmd)
     run_cmd(cmd)
