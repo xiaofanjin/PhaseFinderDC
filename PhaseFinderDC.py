@@ -10,6 +10,7 @@ import pandas as pd
 from Bio import SeqIO
 from Bio.SeqUtils import gc_fraction
 
+## overall architecture of code is borrowed from original PhaseFinder (https://github.com/XiaofangJ/PhaseFinder)
 def run_cmd(cmd):
     p = subprocess.Popen(
         cmd,
@@ -45,7 +46,7 @@ def process(infile):
 def main():
     pass
 
-
+## locate command is identical to original PhaseFinder
 @main.command(help="Locate putative inverted regions")
 @click.option(
     "-f",
@@ -214,6 +215,7 @@ def locate(fasta, tab, einv, mismatch, irsize, gcratio, polymer):
                 )
     os.remove(tmpout + ".pos.tab")
 
+## create command is mostly identical to original PhaseFinder with exception that sequences between potential invertons are also included in alignment index (see inter_seq below)
 
 @main.command(help="Create inverted fasta file")
 @click.option(
@@ -265,6 +267,7 @@ def create(fasta, tab, flanksize, threads, inv):
             for each_line in subsetLines:
 
                 if pos<int(each_line[1]):
+                    ## inter_seq includes sequences between potential invertons (new in PhaseFinderDC)
                     inter_seq=each_seq[pos:int(each_line[1])]
                     inter_seq.id=each_line[0] + ":" + f"{pos}-{each_line[1]}"
                     inter_seq.description = ""
@@ -310,7 +313,7 @@ def create(fasta, tab, flanksize, threads, inv):
     print("****** NOW RUNNING COMMAND ******: " + cmd)
     run_cmd(cmd)
 
-
+## ratio command has been updated from original PhaseFinder to use bowtie2 instead of bowtie, with a MAPQ threshold and also flexibility to set bowtie2 flags
 @main.command(help="Align reads to inverted fasta file")
 @click.option(
     "-i",
@@ -336,9 +339,11 @@ def create(fasta, tab, flanksize, threads, inv):
 @click.option(
     "-p", "--threads", help="Number of threads", type=int, default=1, required=False
 )
+## new in PhaseFinderDC, minmapq flag specifies minimum MAPQ score for a read to be counted when enumerating F/R counts
 @click.option(
     "-q", "--minmapq", help="bowtie2 mapQ threshold to filter read alignments", type=int, default=30, required=False
 )
+## new in PhaseFinderDC, bt2args allows flags to be passed on to bowtie2
 @click.option(
     "-a", "--bt2args", help="bowtie2 arguments", type=str, default="--very-sensitive", required=False
 )
