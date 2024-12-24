@@ -1,87 +1,85 @@
 name: PhaseFinderDC
 channels:
+  - biobakery
   - conda-forge
   - bioconda
   - defaults
 dependencies:
   - _libgcc_mutex=0.1=conda_forge
   - _openmp_mutex=4.5=2_gnu
-  - bedops=2.4.41=h4ac6f70_2
-  - bedtools=2.31.1=hf5e1c6e_1
-  - biopython=1.83=py312h98912ed_0
-  - bowtie2=2.5.4=he20e202_1
-  - bzip2=1.0.8=hd590300_5
-  - c-ares=1.28.1=hd590300_0
-  - ca-certificates=2024.6.2=hbcca054_0
-  - click=8.1.7=unix_pyh707e725_0
-  - emboss=6.6.0=h008e53c_10
-  - expat=2.6.2=h59595ed_0
+  - bedops=2.4.41=h9948957_3
+  - bedtools=2.31.1=h13024bc_3
+  - biopython=1.84=py312h9a8786e_0
+  - bowtie2=2.5.4=he96a11b_5
+  - bzip2=1.0.8=h4bc722e_7
+  - c-ares=1.34.4=hb9d3cd8_0
+  - ca-certificates=2024.12.14=hbcca054_0
+  - click=8.1.8=pyh707e725_0
+  - emboss=6.6.0=hf576cfb_11
   - font-ttf-dejavu-sans-mono=2.37=hab24e00_0
   - font-ttf-inconsolata=3.000=h77eed37_0
   - font-ttf-source-code-pro=2.038=h77eed37_0
-  - font-ttf-ubuntu=0.83=h77eed37_2
-  - fontconfig=2.14.2=h14ed4e7_0
+  - font-ttf-ubuntu=0.83=h77eed37_3
+  - fontconfig=2.15.0=h7e30c49_1
   - fonts-conda-ecosystem=1=0
   - fonts-conda-forge=1=0
   - freetype=2.12.1=h267a509_2
-  - giflib=5.2.2=hd590300_0
-  - htslib=1.20=h5efdd21_1
-  - icu=73.2=h59595ed_0
+  - htslib=1.21=h566b1c6_1
+  - icu=75.1=he02047a_0
   - keyutils=1.6.1=h166bdaf_0
   - krb5=1.21.3=h659f571_0
-  - ld_impl_linux-64=2.40=hf3520f5_7
+  - ld_impl_linux-64=2.43=h712a8e2_2
   - lerc=4.0.0=h27087fc_0
-  - libblas=3.9.0=22_linux64_openblas
-  - libcblas=3.9.0=22_linux64_openblas
-  - libcurl=8.8.0=hca28451_0
-  - libdeflate=1.20=hd590300_0
+  - libblas=3.9.0=26_linux64_openblas
+  - libcblas=3.9.0=26_linux64_openblas
+  - libcurl=8.11.1=h332b0f4_0
+  - libdeflate=1.23=h4ddbbb0_0
   - libedit=3.1.20191231=he28a2e2_2
   - libev=4.33=hd590300_2
-  - libexpat=2.6.2=h59595ed_0
+  - libexpat=2.6.4=h5888daf_0
   - libffi=3.4.2=h7f98852_5
-  - libgcc-ng=13.2.0=h77fa898_13
-  - libgd=2.3.3=h119a65a_9
-  - libgfortran-ng=13.2.0=h69a702a_13
-  - libgfortran5=13.2.0=h3d2ce59_13
-  - libgomp=13.2.0=h77fa898_13
+  - libgcc=14.2.0=h77fa898_1
+  - libgcc-ng=14.2.0=h69a702a_1
+  - libgd=2.3.3=hd3e95f3_10
+  - libgfortran=14.2.0=h69a702a_1
+  - libgfortran5=14.2.0=hd5240d6_1
+  - libgomp=14.2.0=h77fa898_1
   - libharu=2.4.4=h267a509_0
-  - libhwloc=2.10.0=default_h5622ce7_1001
-  - libiconv=1.17=hd590300_2
   - libjpeg-turbo=3.0.0=hd590300_1
-  - liblapack=3.9.0=22_linux64_openblas
-  - libnghttp2=1.58.0=h47da74e_1
+  - liblapack=3.9.0=26_linux64_openblas
+  - liblzma=5.6.3=hb9d3cd8_1
+  - libnghttp2=1.64.0=h161d5f1_0
   - libnsl=2.0.1=hd590300_0
-  - libopenblas=0.3.27=pthreads_h413a1c8_0
-  - libpng=1.6.43=h2797004_0
-  - libsqlite=3.46.0=hde9e2c9_0
-  - libssh2=1.11.0=h0841786_0
-  - libstdcxx-ng=13.2.0=hc0a3c3a_13
-  - libtiff=4.6.0=h1dd3fc0_3
+  - libopenblas=0.3.28=pthreads_h94d23a6_1
+  - libpng=1.6.44=hadc24fc_0
+  - libsqlite=3.47.2=hee588c1_0
+  - libssh2=1.11.1=hf672d98_0
+  - libstdcxx=14.2.0=hc0a3c3a_1
+  - libstdcxx-ng=14.2.0=h4852527_1
+  - libtiff=4.7.0=hd9ff511_3
   - libuuid=2.38.1=h0b41bf4_0
-  - libwebp=1.4.0=h2c329e2_0
-  - libwebp-base=1.4.0=hd590300_0
+  - libwebp-base=1.5.0=h851e524_0
   - libxcrypt=4.4.36=hd590300_1
-  - libxml2=2.12.7=hc051c1a_1
-  - libzlib=1.2.13=h4ab18f5_6
-  - ncurses=6.5=h59595ed_0
-  - numpy=2.0.0=py312h22e1c76_0
-  - openssl=3.3.1=h4ab18f5_1
-  - pandas=2.2.2=py312h1d6d2e6_1
+  - libzlib=1.3.1=hb9d3cd8_2
+  - ncurses=6.5=he02047a_1
+  - numpy=2.2.1=py312h7e784f5_0
+  - openssl=3.4.0=hb9d3cd8_0
+  - pandas=2.2.3=py312hf9745cd_1
   - perl=5.32.1=7_hd590300_perl5
-  - pip=24.0=pyhd8ed1ab_0
-  - python=3.12.3=hab00c5b_0_cpython
-  - python-dateutil=2.9.0=pyhd8ed1ab_0
-  - python-tzdata=2024.1=pyhd8ed1ab_0
-  - python_abi=3.12=4_cp312
+  - pip=24.3.1=pyh8b19718_2
+  - pybedtools=0.10.0=py312h5e9d817_3
+  - pysam=0.22.1=py312h47d5410_3
+  - python=3.12.8=h9e4cc4f_1_cpython
+  - python-dateutil=2.9.0.post0=pyhff2d567_1
+  - python-tzdata=2024.2=pyhd8ed1ab_1
+  - python_abi=3.12=5_cp312
   - pytz=2024.1=pyhd8ed1ab_0
   - readline=8.2=h8228510_1
-  - samtools=1.20=h50ea8bc_0
-  - setuptools=70.1.1=pyhd8ed1ab_0
-  - six=1.16.0=pyh6c4a22f_0
-  - tbb=2021.12.0=h297d8ca_1
+  - samtools=1.21=h96c455f_1
+  - setuptools=75.6.0=pyhff2d567_1
+  - six=1.17.0=pyhd8ed1ab_0
   - tk=8.6.13=noxft_h4845f30_101
-  - tzdata=2024a=h0c530f3_0
-  - wheel=0.43.0=pyhd8ed1ab_1
-  - xz=5.2.6=h166bdaf_0
-  - zlib=1.2.13=h4ab18f5_6
+  - tzdata=2024b=hc8b5060_0
+  - wheel=0.45.1=pyhd8ed1ab_1
+  - zlib=1.3.1=hb9d3cd8_2
   - zstd=1.5.6=ha6fb4c9_0
