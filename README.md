@@ -12,7 +12,7 @@ Like original PhaseFinder, PhaseFinderDC works by identifying regions flanked by
 + [bowtie2](https://github.com/BenLangmead/bowtie2)
 + [einverted](http://emboss.sourceforge.net/apps/release/6.6/emboss/apps/einverted.html)
 + [bedops](https://bedops.readthedocs.io/en/latest/)
-+ [bedtools](https://bedtools.readthedocs.io/en/latest/)
++ [pybedtools](https://daler.github.io/pybedtools/)
 + [click](https://click.palletsprojects.com/en/8.1.x/)
 
 To install PhaseFinderDC
