@@ -133,7 +133,7 @@ Options:
 * A table file (with suffix ".info.tab") describing the location of inverted repeats in the above fasta file
 
 ---
-### 3. Align sequence reads to inverted sequence database and calculate the ratio of reads aligning to the F or R orienation. 
+### 3. Align sequence reads to inverted sequence database and calculate the ratio of reads aligning to the F or R orientation. 
 ```
 Usage: PhaseFinderDC.py ratio [OPTIONS]
 
@@ -171,6 +171,60 @@ Span_R       | The number of reads supporting the R orientation spanning the inv
 Span_ratio   | Span_R/(Span_F + Span_R). The percent of reads supporting the R orientation with the spanning method. 
 
 As with the original PhaseFinder algorithm, true invertible regions have reads supporting both the F and R orientation. We recommend combining the information from both the paired-end (Pe) and spanning (Span) methods to find valid invertible DNA regions. Our default is similar to that recommended by the original PhaseFinder, to classify a region as invertible if Pe_R >= 5 and Span_R >= 5 and Pe_F >= 5 and Span_F >= 5. 
+
+### 4. (Optional) Predict gene expression based on inverton orientation, promoter and CDS sites. 
+Users can use the included accessory script predictGeneExpressionFromOrientation.py to predict how genes and promoters would regulate gene expression based on inverton orientation by specifying a list of inverton IDs in the format output by PhaseFinderDC. Additionally, this requires (i) a bed file of promoter location / strand information, (ii) a bed file of gene CDS location / strand information, and (iii) an associated chrom.sizes file can. Using provided sample data, this would look like:
+
+```
+cd predictGeneExpressionFromOrientation
+python predictGeneExpressionFromOrientation.py -i data/invertonIDs.txt -g data/pgapStrandedAnnotations.bed -p data/predictedPromoters.bed -c data/hCom2.chromsizes -o data/predictions.tsv
+```
+
+Information on predictGeneExpressionFromOrientation.py flags are as follows:
+```
+Usage: predictGeneExpressionFromOrientation.py [OPTIONS]
+
+Options:
+  -i, --invertons PATH   file listing inverton IDs  [required]
+  -g, --genes PATH       bed file listing gene locations and strand
+                         information  [required]
+
+  -p, --promoters PATH   bed file listing promoter locations and strand
+                         information  [required]
+
+  -c, --chromsizes PATH  chromsizes file  [required]
+  -s, --slop INTEGER     how far in bp to look for genes near invertons
+                         (bedtools slop parameter), default 5000bp
+
+  -o, --output PATH      output file name  [required]
+  --help                 Show this message and exit.
+```
+
+#### Input
+* file listing inverton IDs (one line per inverton ID, include only the inverton ID on each line)
+* bed file describing gene locations and strand information
+* bed file describing promoter locations and strand information
+* chrom.sizes file
+* slop size in base pairs -- how far away from invertons to look for possibly regulated genes
+
+#### Output
+* A tab separated table file that lists potentially inverton-regulated promoters and which genes they regulate
+
+ Column name          | Explanation                                                                 |
+----------------------|-----------------------------------------------------------------------------|
+chrom                 | contig on which promoter occurs
+start_promoter        | promoter start location
+end_promoter          | promoter end location
+name_promoter         | promoter name
+score_promoter        | promoter score
+strand_promoter       | promoter strand
+start_gene            | gene/CDS start location
+end_gene              | gene/CDS end location
+name_gene             | gene/CDS name
+score_gene            | gene/CDS score
+strand_gene           | gene/CDS strand
+inverton ID           | ID of associated inverton
+expressedOrientation  | inverton orientation (F or R) where gene expression is predicted
 
 ## Citation
 Jin X, et al. Comprehensive profiling of genomic invertons in defined gut microbial community reveals associations with intestinal colonization and surface adhesion, *bioRxiv* (2024) 
