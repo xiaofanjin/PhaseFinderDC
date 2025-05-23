@@ -227,7 +227,7 @@ inverton ID           | ID of associated inverton
 expressedOrientation  | inverton orientation (F or R) where gene expression is predicted
 
 ## Citation
-Jin X, et al. Comprehensive profiling of genomic invertons in defined gut microbial community reveals associations with intestinal colonization and surface adhesion, *bioRxiv* (2024) 
+Jin X, et al. Comprehensive profiling of genomic invertons in defined gut microbial community reveals associations with intestinal colonization and surface adhesion, *Microbiome* (2025) [DOI: https://doi.org/10.1186/s40168-025-02052-7](https://link.springer.com/article/10.1186/s40168-025-02052-7)
 
 ## Citation for original PhaseFinder
 Jiang X, Hall AB, et al. Invertible promoters mediate bacterial phase variation, antibiotic resistance, and host adaptation in the gut, *Science* (2019) [DOI: 10.1126/science.aau5238](http://science.sciencemag.org/content/363/6423/181)
